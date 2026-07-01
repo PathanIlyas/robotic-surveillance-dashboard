@@ -3,27 +3,39 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, Video, Bot, Target, Brain, Activity,
   MapPin, Radio, Bell, FileBarChart, Thermometer, Zap,
-  Users, Settings, ChevronLeft, ChevronRight, Shield
+  Users, Settings, ChevronLeft, ChevronRight, Shield,
+  Mountain, Waves, Plane, Ship, Cpu, BarChart3
 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { useAlertStore } from '../../store/alertStore'
 import { SYSTEM_SHORT, VERSION } from '../../utils/constants'
 
+// Internal React routes
 const navItems = [
-  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/surveillance', icon: Video, label: 'Live Surveillance' },
-  { path: '/fleet', icon: Bot, label: 'Robot Fleet' },
-  { path: '/missions', icon: Target, label: 'Mission Control' },
-  { path: '/ai-detection', icon: Brain, label: 'AI Detection' },
-  { path: '/sensors', icon: Activity, label: 'Sensor Monitoring' },
-  { path: '/gps', icon: MapPin, label: 'GPS Tracking' },
-  { path: '/communication', icon: Radio, label: 'Communication' },
-  { path: '/alerts', icon: Bell, label: 'Alerts' },
-  { path: '/reports', icon: FileBarChart, label: 'Reports' },
-  { path: '/environmental', icon: Thermometer, label: 'Environmental' },
-  { path: '/power', icon: Zap, label: 'Power Management' },
-  { path: '/users', icon: Users, label: 'Users' },
-  { path: '/settings', icon: Settings, label: 'Settings' },
+  { path: '/', icon: LayoutDashboard, label: 'Dashboard', section: 'OVERVIEW' },
+  // External Sentinel-X domain pages (static HTML)
+  { href: '/dashboard.html',          icon: LayoutDashboard, label: 'Command Center', section: 'SENTINEL-X', external: true },
+  { href: '/land-surveillance.html',  icon: Mountain,        label: 'Land Surveillance', external: true },
+  { href: '/drone-surveillance.html', icon: Plane,           label: 'Drone Surveillance', external: true },
+  { href: '/water-surveillance.html', icon: Waves,           label: 'Water Surveillance', external: true },
+  // React routes — Operations
+  { path: '/surveillance', icon: Video,   label: 'Live Surveillance', section: 'OPERATIONS' },
+  { path: '/missions',     icon: Target,  label: 'Mission Control' },
+  { path: '/ai-detection', icon: Brain,   label: 'AI Detection' },
+  { path: '/gps',          icon: MapPin,  label: 'GPS Tracking' },
+  // React routes — Fleet
+  { path: '/fleet',        icon: Bot,     label: 'Robot Fleet', section: 'FLEETS' },
+  // React routes — Systems
+  { path: '/sensors',      icon: Activity, label: 'Sensor Monitoring', section: 'SYSTEMS' },
+  { path: '/communication',icon: Radio,   label: 'Communication' },
+  { path: '/alerts',       icon: Bell,    label: 'Alerts' },
+  // React routes — Analytics
+  { path: '/reports',      icon: FileBarChart, label: 'Reports', section: 'ANALYTICS' },
+  { path: '/environmental',icon: Thermometer,  label: 'Environmental' },
+  { path: '/power',        icon: Zap,          label: 'Power' },
+  // Config
+  { path: '/users',        icon: Users,    label: 'Users', section: 'CONFIG' },
+  { path: '/settings',     icon: Settings, label: 'Settings' },
 ]
 
 export default function Sidebar() {
@@ -61,48 +73,66 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5 custom-scrollbar">
-        {navItems.map(({ path, icon: Icon, label }) => {
-          const isActive = location.pathname === path
+      <nav className="flex-1 overflow-y-auto py-3 px-2 custom-scrollbar">
+        {navItems.map((item) => {
+          const { path, href, icon: Icon, label, section, external } = item
+          const isActive = path ? location.pathname === path : false
           const isAlert = path === '/alerts'
+          const key = path || href
+
+          const innerContent = (
+            <motion.div
+              whileHover={{ x: sidebarCollapsed ? 0 : 3 }}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer relative
+                ${isActive
+                  ? 'text-accent-green bg-accent-green/5'
+                  : external
+                    ? 'text-cyan-500/70 hover:text-cyan-400 hover:bg-cyan-500/5'
+                    : 'text-gray-500 hover:text-gray-200 hover:bg-white/3'
+                }`}
+              style={isActive ? {
+                borderLeft: '2px solid #00ff41',
+                boxShadow: 'inset 0 0 20px rgba(0,255,65,0.03)',
+              } : {}}
+            >
+              <div className="relative flex-shrink-0">
+                <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-accent-green' : ''}`} size={18} />
+                {isAlert && unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-accent-red rounded-full text-white text-[9px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </div>
+              <AnimatePresence>
+                {!sidebarCollapsed && (
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="whitespace-nowrap overflow-hidden font-mono text-xs tracking-wide uppercase flex items-center gap-1"
+                  >
+                    {label}
+                    {external && <span className="text-[8px] opacity-40">↗</span>}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+              </motion.div>
+            )
 
           return (
-            <NavLink key={path} to={path}>
-              <motion.div
-                whileHover={{ x: sidebarCollapsed ? 0 : 3 }}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer relative
-                  ${isActive
-                    ? 'text-accent-green bg-accent-green/5'
-                    : 'text-gray-500 hover:text-gray-200 hover:bg-white/3'
-                  }`}
-                style={isActive ? {
-                  borderLeft: '2px solid #00ff41',
-                  boxShadow: 'inset 0 0 20px rgba(0,255,65,0.03)',
-                } : {}}
-              >
-                <div className="relative flex-shrink-0">
-                  <Icon className={`w-4.5 h-4.5 ${isActive ? 'text-accent-green' : ''}`} size={18} />
-                  {isAlert && unreadCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-accent-red rounded-full text-white text-[9px] font-bold flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
+            <div key={key} className="mb-0.5">
+              {section && !sidebarCollapsed && (
+                <div className="px-3 pt-3 pb-1 font-mono text-[9px] text-gray-700 uppercase tracking-widest">
+                  {section}
                 </div>
-                <AnimatePresence>
-                  {!sidebarCollapsed && (
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="whitespace-nowrap overflow-hidden font-mono text-xs tracking-wide uppercase"
-                    >
-                      {label}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </NavLink>
+              )}
+              {external ? (
+                <a href={href} target="_self">{innerContent}</a>
+              ) : (
+                <NavLink to={path}>{innerContent}</NavLink>
+              )}
+            </div>
           )
         })}
       </nav>

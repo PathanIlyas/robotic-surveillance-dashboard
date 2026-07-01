@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Water Surveillance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <style>
+    .water-wave{background:linear-gradient(180deg,#00102a 0%,#001830 40%,#000e1a 100%);}
+    .sonar-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,212,255,.2);animation:sonar-expand 3s ease-out infinite;}
+    @keyframes sonar-expand{0%{width:20px;height:20px;margin:-10px;opacity:.8}100%{width:200px;height:200px;margin:-100px;opacity:0}}
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <div class="page-content">
+      <!-- Water stat cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up"><div class="stat-card amber"><div class="stat-label">Marine Vessels</div><div class="stat-value" data-count="5">0</div><div class="stat-sub">Active patrol</div><div class="stat-icon-wrap"><i class="fa-solid fa-ship"></i></div></div></div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="50"><div class="stat-card red"><div class="stat-label">Unauthorized</div><div class="stat-value" data-count="3">0</div><div class="stat-sub">Vessels detected</div><div class="stat-icon-wrap"><i class="fa-solid fa-triangle-exclamation"></i></div></div></div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="100"><div class="stat-card blue"><div class="stat-label">Coastline Km</div><div class="stat-value" data-count="240">0</div><div class="stat-sub">Monitored</div><div class="stat-icon-wrap"><i class="fa-solid fa-water"></i></div></div></div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="150"><div class="stat-card red"><div class="stat-label">Human Overboard</div><div class="stat-value" data-count="1">0</div><div class="stat-sub">ALERT ACTIVE</div><div class="stat-icon-wrap"><i class="fa-solid fa-person-falling-burst"></i></div></div></div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="200"><div class="stat-card amber"><div class="stat-label">Illegal Fishing</div><div class="stat-value" data-count="7">0</div><div class="stat-sub">Incidents today</div><div class="stat-icon-wrap"><i class="fa-solid fa-fish"></i></div></div></div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="250"><div class="stat-card purple"><div class="stat-label">Oil Spill Alerts</div><div class="stat-value" data-count="2">0</div><div class="stat-sub">Monitoring active</div><div class="stat-icon-wrap"><i class="fa-solid fa-droplet"></i></div></div></div>
+      </div>
+
+      <!-- Water Detection Modules -->
+      <div class="row g-3 mb-4">
+        <div class="col-12"><h6 class="mono text-blue" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.7">Water Surveillance Modules</h6></div>
+        <script>
+          const WATER_MODS=[
+            {icon:'fa-ship',label:'Boat Detection',count:12,color:'amber'},
+            {icon:'fa-anchor',label:'Ship Detection',count:5,color:'blue'},
+            {icon:'fa-person-falling-burst',label:'Human Overboard',count:1,color:'red'},
+            {icon:'fa-fish',label:'Illegal Fishing',count:7,color:'amber'},
+            {icon:'fa-border-all',label:'Border Intrusion',count:3,color:'red'},
+            {icon:'fa-circle',label:'Floating Objects',count:14,color:'green'},
+            {icon:'fa-droplet',label:'Oil Spill',count:2,color:'purple'},
+            {icon:'fa-vial',label:'Pollution',count:4,color:'purple'},
+            {icon:'fa-fire',label:'Fire on Boat',count:1,color:'red'},
+            {icon:'fa-eye',label:'Coastline Monitor',count:240,color:'blue'},
+          ];
+          document.write(WATER_MODS.map(m=>`
+            <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up">
+              <div class="glass-card p-3 text-center" style="border-color:var(--border-color)">
+                <div class="activity-icon-wrap ${m.color} mx-auto mb-2" style="width:36px;height:36px;border-radius:10px">
+                  <i class="fa-solid ${m.icon}" style="font-size:15px"></i>
+                </div>
+                <div class="mono text-${m.color}" style="font-size:22px;font-weight:700;line-height:1" data-count="${m.count}">0</div>
+                <div class="mono" style="font-size:9px;color:var(--text-muted);margin-top:4px">${m.label}</div>
+              </div>
+            </div>`).join(''));
+        </script>
+      </div>
+
+      <!-- Marine map + Sonar -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-8" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-map-location-dot"></i> Marine Tactical Map</div>
+              <span class="badge-military badge-blue"><span class="status-dot blue" style="width:5px;height:5px"></span> LIVE</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="map-placeholder water-wave" style="height:360px">
+                <div class="map-grid" style="background-image:linear-gradient(rgba(0,212,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.04) 1px,transparent 1px)"></div>
+                <!-- Zones -->
+                <div class="map-zone" style="left:5%;top:8%;width:42%;height:60%;border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)"></div>
+                <div class="map-zone restricted" style="left:55%;top:10%;width:35%;height:40%"></div>
+                <!-- Labels -->
+                <div class="map-label" style="left:7%;top:6%;color:rgba(0,212,255,.5)">EEZ PATROL ZONE A</div>
+                <div class="map-label" style="left:57%;top:8%;color:rgba(255,49,49,.5)">RESTRICTED WATERS</div>
+                <div class="map-label" style="left:15%;top:72%;color:rgba(0,212,255,.4)">COASTLINE PERIMETER</div>
+                <!-- Patrol boats -->
+                <div class="map-robot-dot boat-unit" style="left:22%;top:35%;animation:boat-move 6s ease-in-out infinite"><i class="fa-solid fa-ship" style="font-size:7px"></i><div class="map-tooltip">MRN-001 TEMPEST · Active</div></div>
+                <div class="map-robot-dot boat-unit" style="left:38%;top:52%;animation:boat-move 8s ease-in-out infinite reverse"><i class="fa-solid fa-ship" style="font-size:7px"></i><div class="map-tooltip">MRN-002 STORM · Patrol</div></div>
+                <div class="map-robot-dot boat-unit" style="left:14%;top:58%;animation:boat-move 10s ease-in-out infinite"><i class="fa-solid fa-ship" style="font-size:7px"></i><div class="map-tooltip">MRN-003 TIDE · Coastal</div></div>
+                <!-- Threats -->
+                <div class="map-robot-dot threat-dot" style="left:60%;top:28%"><i class="fa-solid fa-triangle-exclamation" style="font-size:6px"></i><div class="map-tooltip" style="color:var(--accent-red)">⚠ Unauthorized Vessel</div></div>
+                <div class="map-robot-dot threat-dot" style="left:68%;top:38%;animation-delay:.5s"><i class="fa-solid fa-fish" style="font-size:6px"></i><div class="map-tooltip" style="color:var(--accent-amber)">⚠ Illegal Fishing</div></div>
+                <!-- Oil spill marker -->
+                <div class="map-robot-dot" style="left:45%;top:65%;background:rgba(179,71,255,.6);border:none"><i class="fa-solid fa-droplet" style="font-size:6px;color:#fff"></i><div class="map-tooltip" style="color:var(--accent-purple)">Oil Spill Detection</div></div>
+                <!-- Legend -->
+                <div class="map-legend">
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-amber)"></div>Patrol Boat (3)</div>
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-red)"></div>Unauthorized (2)</div>
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-purple)"></div>Spill Marker (1)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sonar + vessel table -->
+        <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card mb-3">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-circle-dot"></i> Sonar System</div>
+              <span class="badge-military badge-blue">ACTIVE</span>
+            </div>
+            <div class="card-body d-flex flex-column align-items-center gap-2">
+              <div style="position:relative;width:140px;height:140px">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,.05),transparent);border:1px solid rgba(0,212,255,.2)"></div>
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90px;height:90px;border-radius:50%;border:1px solid rgba(0,212,255,.15)"></div>
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.3)"></div>
+                <div style="position:absolute;top:50%;left:50%;transform-origin:center;width:50%;height:1px;background:linear-gradient(90deg,rgba(0,212,255,.9),transparent);animation:radar-spin 2.5s linear infinite"></div>
+                <!-- Sonar blips -->
+                <div style="position:absolute;top:30%;left:65%;width:7px;height:7px;border-radius:50%;background:var(--accent-amber);box-shadow:0 0 8px var(--accent-amber);animation:blip-fade 3s infinite"></div>
+                <div style="position:absolute;top:58%;left:30%;width:6px;height:6px;border-radius:50%;background:var(--accent-red);box-shadow:0 0 6px var(--accent-red);animation:blip-fade 3s .8s infinite"></div>
+                <!-- Sonar rings -->
+                <div class="sonar-ring" style="top:50%;left:50%;animation-delay:0s"></div>
+                <div class="sonar-ring" style="top:50%;left:50%;animation-delay:1s"></div>
+                <div class="sonar-ring" style="top:50%;left:50%;animation-delay:2s"></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;width:100%">
+                <div class="d-flex justify-content-between"><span class="mono" style="font-size:10px;color:var(--text-muted)">Range</span><span class="mono text-blue" style="font-size:10px">2,000m</span></div>
+                <div class="d-flex justify-content-between"><span class="mono" style="font-size:10px;color:var(--text-muted)">Contacts</span><span class="mono text-amber" style="font-size:10px">5 vessels</span></div>
+                <div class="d-flex justify-content-between"><span class="mono" style="font-size:10px;color:var(--text-muted)">Threats</span><span class="mono text-red" style="font-size:10px">2 hostile</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Boat fleet -->
+          <div class="glass-card">
+            <div class="card-header-bar"><div class="card-title text-amber"><i class="fa-solid fa-ship"></i> Patrol Boats</div></div>
+            <div class="card-body p-0" id="boat-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marine detection chart -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-7" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar"><div class="card-title text-blue"><i class="fa-solid fa-chart-area"></i> Marine Incident Detection — 24H</div></div>
+            <div class="card-body"><canvas id="marineChart" height="220"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-5" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar"><div class="card-title text-amber"><i class="fa-solid fa-list-check"></i> Incident Log</div></div>
+            <div class="card-body p-0">
+              <div class="activity-feed" style="padding:10px 16px;max-height:260px;overflow-y:auto">
+                <div class="activity-item"><div class="activity-icon-wrap red"><i class="fa-solid fa-ship"></i></div><div class="activity-text"><div class="activity-title">Unauthorized Vessel — MV UNKNOWN</div><div class="activity-meta">Marine Zone B · CRITICAL</div></div><div class="activity-time">14:32</div></div>
+                <div class="activity-item"><div class="activity-icon-wrap amber"><i class="fa-solid fa-fish"></i></div><div class="activity-text"><div class="activity-title">Illegal Fishing Detected</div><div class="activity-meta">EEZ Boundary · WARNING</div></div><div class="activity-time">14:18</div></div>
+                <div class="activity-item"><div class="activity-icon-wrap red"><i class="fa-solid fa-person-falling-burst"></i></div><div class="activity-text"><div class="activity-title">Human Overboard Alert</div><div class="activity-meta">Marine Sector 5 · CRITICAL</div></div><div class="activity-time">13:55</div></div>
+                <div class="activity-item"><div class="activity-icon-wrap purple"><i class="fa-solid fa-droplet"></i></div><div class="activity-text"><div class="activity-title">Oil Spill Signature</div><div class="activity-meta">Coastal Zone 3 · MONITORING</div></div><div class="activity-time">13:30</div></div>
+                <div class="activity-item"><div class="activity-icon-wrap blue"><i class="fa-solid fa-anchor"></i></div><div class="activity-text"><div class="activity-title">Unknown Ship Identified</div><div class="activity-meta">Territorial Waters · INFO</div></div><div class="activity-time">12:48</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+Chart.defaults.color='#4a6a4a';Chart.defaults.borderColor='#1a2e1a';Chart.defaults.font.family="'JetBrains Mono',monospace";Chart.defaults.font.size=10;
+
+const BOATS=[
+  {id:'MRN-001',name:'Tempest',battery:80,status:'active',mission:'Coastline Patrol'},
+  {id:'MRN-002',name:'Storm',  battery:95,status:'active',mission:'Border Guard'},
+  {id:'MRN-003',name:'Tide',   battery:62,status:'active',mission:'Buoy Inspection'},
+  {id:'MRN-004',name:'Reef',   battery:100,status:'idle', mission:'Standby'},
+  {id:'MRN-005',name:'Crest',  battery:18,status:'active',mission:'Emergency Response'},
+];
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('sidebar-mount').innerHTML=buildSidebar('water');
+  document.getElementById('topbar-mount').innerHTML=buildTopbar('Water Surveillance','Marine Domain — Coastal Monitoring Active');
+  initComponents();AOS.init({duration:500,once:true});animateCounters();animateProgressBars();
+
+  const bc=b=>b>60?'green':b>30?'amber':'red';
+  const bl=document.getElementById('boat-list');
+  bl.innerHTML=BOATS.map(b=>`
+    <div class="d-flex align-items-center justify-content-between px-3 py-2" style="border-bottom:1px solid var(--border-color)">
+      <div class="d-flex align-items-center gap-2">
+        <span class="status-dot ${b.status==='active'?'online':b.status==='idle'?'warning':'offline'}"></span>
+        <div>
+          <div class="mono" style="font-size:11px;color:var(--accent-amber);font-weight:600">${b.id}</div>
+          <div class="mono" style="font-size:9px;color:var(--text-muted)">${b.mission}</div>
+        </div>
+      </div>
+      <div>
+        <div class="mono text-${bc(b.battery)}" style="font-size:11px;font-weight:700">${b.battery}%</div>
+      </div>
+    </div>`).join('');
+
+  const ctx=document.getElementById('marineChart');
+  new Chart(ctx,{type:'line',data:{labels:['00','02','04','06','08','10','12','14','16','18','20','22'],datasets:[
+    {label:'Vessels',data:[1,0,2,3,5,4,6,5,4,3,2,1],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.1)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
+    {label:'Illegal Fishing',data:[0,0,1,2,3,4,3,2,3,2,1,0],borderColor:'#ffb800',backgroundColor:'rgba(255,184,0,.07)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
+    {label:'Border Breach',data:[0,0,0,1,2,1,2,3,1,0,1,0],borderColor:'#ff3131',backgroundColor:'rgba(255,49,49,.07)',fill:true,tension:.4,borderWidth:2,pointRadius:2},
+  ]},options:{responsive:true,plugins:{legend:{labels:{padding:12,boxWidth:10}}},scales:{x:{grid:{color:'rgba(26,46,26,.5)'}},y:{grid:{color:'rgba(26,46,26,.5)'},beginAtZero:true}}}});
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Command Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <!-- ALERT TICKER -->
+    <div style="background:rgba(255,49,49,.07);border-bottom:1px solid rgba(255,49,49,.2);padding:7px 24px;display:flex;align-items:center;gap:12px;">
+      <i class="fa-solid fa-triangle-exclamation text-red" style="font-size:12px;animation:blink 1s infinite"></i>
+      <span class="mono" style="font-size:10px;color:var(--accent-red);text-transform:uppercase;letter-spacing:.06em">
+        THREAT CONDITION ELEVATED &nbsp;|&nbsp; 4 ACTIVE CRITICAL ALERTS &nbsp;|&nbsp; SECTOR ALPHA BREACH CONFIRMED
+      </span>
+      <span class="mono" id="ticker-time" style="font-size:10px;color:rgba(255,49,49,.5);margin-left:auto"></span>
+    </div>
+
+    <div class="page-content">
+
+      <!-- STAT CARDS ROW 1 -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="0">
+          <div class="stat-card green">
+            <div class="stat-label">Total Robots</div>
+            <div class="stat-value" data-count="12">0</div>
+            <div class="stat-sub">Land units active</div>
+            <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +2 today</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-robot"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="50">
+          <div class="stat-card blue">
+            <div class="stat-label">Total Drones</div>
+            <div class="stat-value" data-count="8">0</div>
+            <div class="stat-sub">Aerial surveillance</div>
+            <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> 6 airborne</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-helicopter"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-card amber">
+            <div class="stat-label">Total Boats</div>
+            <div class="stat-value" data-count="5">0</div>
+            <div class="stat-sub">Marine patrol</div>
+            <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> 3 deployed</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-ship"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="150">
+          <div class="stat-card purple">
+            <div class="stat-label">Active Missions</div>
+            <div class="stat-value" data-count="7">0</div>
+            <div class="stat-sub">Across all domains</div>
+            <div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +1 new</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-crosshairs"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="200">
+          <div class="stat-card red">
+            <div class="stat-label">Threats Detected</div>
+            <div class="stat-value" data-count="23">0</div>
+            <div class="stat-sub">Last 24 hours</div>
+            <div class="stat-trend down"><i class="fa-solid fa-arrow-trend-up"></i> 4 critical</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-shield-halved"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="250">
+          <div class="stat-card amber">
+            <div class="stat-label">Today's Alerts</div>
+            <div class="stat-value" data-count="41">0</div>
+            <div class="stat-sub">Total incidents</div>
+            <div class="stat-trend down"><i class="fa-solid fa-arrow-trend-down"></i> 8 unread</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-bell"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAT CARDS ROW 2 -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3" data-aos="fade-up">
+          <div class="stat-card green">
+            <div class="stat-label">Fleet Battery Avg</div>
+            <div class="stat-value" style="font-size:24px" data-count="68">0</div><span class="stat-sub">%</span>
+            <div class="mt-2"><div class="prog-bar-wrap"><div class="prog-bar green" data-width="68" style="width:0"></div></div></div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-battery-three-quarters"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="50">
+          <div class="stat-card blue">
+            <div class="stat-label">Network Health</div>
+            <div class="stat-value" style="font-size:24px">5G</div>
+            <div class="stat-sub d-flex align-items-center gap-2 mt-1"><span class="status-dot online"></span> 210 Mbps Active</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-wifi"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-card green">
+            <div class="stat-label">GPS Status</div>
+            <div class="stat-value" style="font-size:24px">LOCK</div>
+            <div class="stat-sub d-flex align-items-center gap-2 mt-1"><span class="status-dot online"></span> 14 Satellites</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-satellite"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="150">
+          <div class="stat-card blue">
+            <div class="stat-label">Cloud Status</div>
+            <div class="stat-value" style="font-size:24px">SYNC</div>
+            <div class="stat-sub d-flex align-items-center gap-2 mt-1"><span class="status-dot online"></span> Last: 2s ago</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-cloud"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP + ACTIVITY FEED -->
+      <div class="row g-3 mb-4" id="map">
+        <div class="col-12 col-lg-8" data-aos="fade-up">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-map-location-dot"></i> Live Tactical Map</div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge-military badge-green"><span class="status-dot online" style="width:5px;height:5px"></span> LIVE</span>
+                <button class="btn-mil btn-mil-green" style="padding:4px 10px;font-size:9px" onclick="toggleGeofence()"><i class="fa-solid fa-draw-polygon"></i> Geofence</button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="map-placeholder" id="tactical-map" style="height:400px">
+                <div class="map-grid"></div>
+                <div class="map-zone geofence" style="left:8%;top:10%;width:40%;height:55%"></div>
+                <div class="map-zone restricted" style="left:55%;top:15%;width:30%;height:35%"></div>
+                <div class="map-zone mission" style="left:20%;top:68%;width:50%;height:22%"></div>
+                <div class="map-label" style="left:10%;top:8%">PATROL ZONE A</div>
+                <div class="map-label" style="left:57%;top:13%;color:rgba(255,49,49,.5)">RESTRICTED R-7</div>
+                <div class="map-label" style="left:22%;top:66%;color:rgba(0,212,255,.5)">MISSION ZONE</div>
+                <div class="map-robot-dot land-unit" style="left:20%;top:30%">
+                  <i class="fa-solid fa-robot" style="font-size:7px"></i>
+                  <div class="map-tooltip">RVL-001 ALPHA · Active · Bat 87%</div>
+                </div>
+                <div class="map-robot-dot land-unit" style="left:35%;top:22%">
+                  <i class="fa-solid fa-robot" style="font-size:7px"></i>
+                  <div class="map-tooltip">RVL-002 BRAVO · Active · Bat 62%</div>
+                </div>
+                <div class="map-robot-dot drone-unit" style="left:62%;top:25%;animation:drone-move 8s ease-in-out infinite">
+                  <i class="fa-solid fa-helicopter" style="font-size:7px"></i>
+                  <div class="map-tooltip">DRN-001 EAGLE · Airborne · Alt 250m</div>
+                </div>
+                <div class="map-robot-dot boat-unit" style="left:28%;top:75%;animation:boat-move 6s ease-in-out infinite">
+                  <i class="fa-solid fa-ship" style="font-size:7px"></i>
+                  <div class="map-tooltip">MRN-001 TEMPEST · Marine Zone B</div>
+                </div>
+                <div class="map-robot-dot threat-dot" style="left:60%;top:30%">
+                  <i class="fa-solid fa-skull-crossbones" style="font-size:6px"></i>
+                  <div class="map-tooltip" style="color:var(--accent-red)">⚠ THREAT · Human · Grid C7</div>
+                </div>
+                <div class="map-legend">
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-green)"></div>Land (3)</div>
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-blue)"></div>Drone (2)</div>
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-amber)"></div>Boat (2)</div>
+                  <div class="map-legend-item"><div class="map-legend-dot" style="background:var(--accent-red)"></div>Threat (1)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card h-100 d-flex flex-column">
+            <div class="card-header-bar">
+              <div class="card-title text-amber"><i class="fa-solid fa-bolt"></i> Live Activity Feed</div>
+              <span class="badge-military badge-amber mono" style="font-size:9px" id="feed-count">5 events</span>
+            </div>
+            <div class="card-body flex-fill overflow-auto p-0">
+              <div style="padding:10px 16px">
+                <div id="activity-feed" class="activity-feed">
+                  <div class="activity-item">
+                    <div class="activity-icon-wrap red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="activity-text">
+                      <div class="activity-title">Human Detected Near Border</div>
+                      <div class="activity-meta">Sector Alpha · CRITICAL</div>
+                    </div>
+                    <div class="activity-time">14:32</div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="activity-icon-wrap blue"><i class="fa-solid fa-helicopter"></i></div>
+                    <div class="activity-text">
+                      <div class="activity-title">DRN-001 Engaged Auto-Patrol</div>
+                      <div class="activity-meta">Sector Delta · INFO</div>
+                    </div>
+                    <div class="activity-time">14:28</div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="activity-icon-wrap amber"><i class="fa-solid fa-ship"></i></div>
+                    <div class="activity-text">
+                      <div class="activity-title">Unauthorized Vessel Detected</div>
+                      <div class="activity-meta">Marine Zone B · WARNING</div>
+                    </div>
+                    <div class="activity-time">14:21</div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="activity-icon-wrap green"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="activity-text">
+                      <div class="activity-title">Mission Alpha Completed</div>
+                      <div class="activity-meta">Sector Charlie · SUCCESS</div>
+                    </div>
+                    <div class="activity-time">14:15</div>
+                  </div>
+                  <div class="activity-item">
+                    <div class="activity-icon-wrap red"><i class="fa-solid fa-fire"></i></div>
+                    <div class="activity-text">
+                      <div class="activity-title">Fire Signature — Thermal</div>
+                      <div class="activity-meta">Sector Bravo Zone 4 · CRITICAL</div>
+                    </div>
+                    <div class="activity-time">14:09</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-5" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-red"><i class="fa-solid fa-chart-area"></i> 24H Threat Detection</div>
+            </div>
+            <div class="card-body"><canvas id="threatChart" height="200"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-chart-pie"></i> Detection Distribution</div>
+            </div>
+            <div class="card-body"><canvas id="detectionPie" height="200"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-wifi"></i> Comm Status</div>
+            </div>
+            <div class="card-body"><div id="comms"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROBOT FLEET TABLE -->
+      <div class="row g-3 mb-4" id="fleet">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-robot"></i> Robot Fleet — Live Status</div>
+              <div class="d-flex gap-2">
+                <span class="badge-military badge-green">4 Active</span>
+                <span class="badge-military badge-amber">1 Idle</span>
+                <span class="badge-military badge-gray">1 Offline</span>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="military-table">
+                  <thead><tr>
+                    <th>Unit ID</th><th>Name</th><th>Domain</th><th>Status</th>
+                    <th>Mission</th><th>Battery</th><th>Signal</th><th>Speed</th><th>Last Sync</th>
+                  </tr></thead>
+                  <tbody id="fleet-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI DETECTION + RADAR -->
+      <div class="row g-3 mb-4" id="ai">
+        <div class="col-12 col-md-4 col-lg-3" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-circle-dot"></i> Radar System</div>
+              <span class="badge-military badge-green">ACTIVE</span>
+            </div>
+            <div class="card-body d-flex flex-column align-items-center gap-3">
+              <div class="radar-container">
+                <div class="radar-sweep"></div>
+                <div class="radar-blip" style="top:35%;left:60%"></div>
+                <div class="radar-blip" style="top:55%;left:28%;animation-delay:.8s"></div>
+                <div class="radar-blip" style="top:70%;left:50%;animation-delay:1.5s"></div>
+                <div class="radar-blip" style="top:25%;left:40%;animation-delay:2.1s"></div>
+              </div>
+              <div style="width:100%">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="mono" style="font-size:10px;color:var(--text-muted)">Range</span>
+                  <span class="mono" style="font-size:10px;color:var(--accent-green)">500m</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="mono" style="font-size:10px;color:var(--text-muted)">Targets</span>
+                  <span class="mono" style="font-size:10px;color:var(--accent-red)">4 detected</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span class="mono" style="font-size:10px;color:var(--text-muted)">Frequency</span>
+                  <span class="mono" style="font-size:10px;color:var(--accent-green)">77 GHz</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-8 col-lg-5" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-purple"><i class="fa-solid fa-brain"></i> AI Detection Log</div>
+              <span class="badge-military badge-purple">Neural Net v3.1</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive" style="max-height:280px;overflow-y:auto">
+                <table class="military-table">
+                  <thead><tr><th>Type</th><th>Confidence</th><th>Unit</th><th>Zone</th><th>Time</th><th>Action</th></tr></thead>
+                  <tbody id="ai-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="100" id="sensors">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-amber"><i class="fa-solid fa-microchip"></i> Sensor Array</div>
+            </div>
+            <div class="card-body" id="sensor-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MISSION TIMELINE + BATTERY CHART -->
+      <div class="row g-3 mb-4" id="missions">
+        <div class="col-12 col-lg-4" data-aos="fade-up">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-crosshairs"></i> Mission Timeline</div>
+            </div>
+            <div class="card-body" id="mission-timeline"></div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-battery-half"></i> Battery Analytics</div>
+            </div>
+            <div class="card-body"><canvas id="batteryChart" height="220"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-amber"><i class="fa-solid fa-chart-bar"></i> Mission Analytics</div>
+            </div>
+            <div class="card-body"><canvas id="missionChart" height="220"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERT AUDIO CONTROL -->
+      <div class="row g-3 mb-4" id="comms">
+        <div class="col-12 col-md-6" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-red"><i class="fa-solid fa-volume-high"></i> Alert Audio Control</div>
+            </div>
+            <div class="card-body">
+              <div class="sound-control-bar">
+                <button class="mute-btn" id="mute-btn-panel" onclick="toggleMute()">
+                  <i class="fa-solid fa-volume-high" id="mute-icon-mute-btn-panel"></i>
+                </button>
+                <span class="mono" style="font-size:10px;color:var(--text-muted);white-space:nowrap">Alert Volume</span>
+                <input type="range" class="volume-slider" min="0" max="1" step="0.05" value="0.6" oninput="setAlertVolume(this.value)"/>
+                <span class="mono" style="font-size:10px;color:var(--accent-green)">ARMED</span>
+              </div>
+              <p class="mono mt-2" style="font-size:10px;color:var(--text-muted)">
+                Alert beep triggers on every new threat detection. Auto-stop after 2s. No overlap.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /page-wrapper -->
+
+<div class="alert-popup-container" id="alert-popup-container"></div>
+
+<script src="assets/js/components.js"></script>
+<script src="assets/js/dashboard.js"></script>
+<script>
+  let geofenceVisible = true;
+  function toggleGeofence() {
+    const zones = document.querySelectorAll('.map-zone');
+    geofenceVisible = !geofenceVisible;
+    zones.forEach(z => z.style.display = geofenceVisible ? '' : 'none');
+  }
+  let feedItemCount = 5;
+  function updateFeedCount() {
+    const el = document.getElementById('feed-count');
+    if (el) el.textContent = feedItemCount + ' events';
+    feedItemCount++;
+  }
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('sidebar-mount').innerHTML = buildSidebar('dashboard');
+    document.getElementById('topbar-mount').innerHTML  = buildTopbar('Command Center Dashboard', 'Live Feed Active — All Domains');
+    buildFleetTable(); buildAITable(); buildSensorGrid(); buildCommStatus();
+    buildMissionTimeline(); buildThreatChart(); buildPieChart();
+    buildBatteryChart(); buildMissionChart(); buildWeatherChart();
+    initComponents();
+    AOS.init({ duration: 500, once: true, easing: 'ease-out' });
+    setInterval(() => {
+      const el = document.getElementById('ticker-time');
+      if (el) el.textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
+    }, 1000);
+    setInterval(updateFeedCount, 5000);
+  });
+</script>
+</body>
+</html>

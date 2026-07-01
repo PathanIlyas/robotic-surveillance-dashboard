@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Mission Control</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+    <div class="page-content">
+
+      <!-- Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3" data-aos="fade-up">
+          <div class="stat-card green">
+            <div class="stat-label">Active Missions</div>
+            <div class="stat-value" data-count="7">0</div>
+            <div class="stat-sub">Across all domains</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-crosshairs"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="50">
+          <div class="stat-card blue">
+            <div class="stat-label">Units Deployed</div>
+            <div class="stat-value" data-count="14">0</div>
+            <div class="stat-sub">In active missions</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-robot"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-card amber">
+            <div class="stat-label">Missions Today</div>
+            <div class="stat-value" data-count="19">0</div>
+            <div class="stat-sub">12 completed</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-clipboard-check"></i></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="150">
+          <div class="stat-card purple">
+            <div class="stat-label">Scheduled</div>
+            <div class="stat-value" data-count="3">0</div>
+            <div class="stat-sub">Pending launch</div>
+            <div class="stat-icon-wrap"><i class="fa-solid fa-clock"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Missions Table -->
+      <div class="row g-3 mb-4">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-crosshairs"></i> Active Operations</div>
+              <div class="d-flex gap-2">
+                <button class="btn-mil btn-mil-green" style="padding:4px 10px;font-size:9px"><i class="fa-solid fa-plus"></i> New Mission</button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="military-table">
+                  <thead><tr>
+                    <th>Mission ID</th><th>Operation Name</th><th>Domain</th><th>Status</th>
+                    <th>Units</th><th>Progress</th><th>Priority</th><th>ETA</th><th>Actions</th>
+                  </tr></thead>
+                  <tbody id="mission-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mission Progress + Analytics -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-5" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-amber"><i class="fa-solid fa-chart-bar"></i> Mission Analytics</div>
+            </div>
+            <div class="card-body"><canvas id="missionAnalyticsChart" height="220"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-timeline"></i> Mission Timeline</div>
+            </div>
+            <div class="card-body" id="mc-timeline"></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-purple"><i class="fa-solid fa-chart-pie"></i> Domain Split</div>
+            </div>
+            <div class="card-body"><canvas id="domainPieChart" height="180"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+Chart.defaults.color='#4a6a4a';Chart.defaults.borderColor='#1a2e1a';Chart.defaults.font.family="'JetBrains Mono',monospace";Chart.defaults.font.size=10;
+
+const MISSIONS = [
+  { id:'MSN-001', name:'Operation Perimeter Watch', domain:'Land',   status:'active',    units:3, progress:78, priority:'HIGH',     eta:'02:14' },
+  { id:'MSN-002', name:'Operation Thermal Scan',    domain:'Land',   status:'active',    units:2, progress:65, priority:'MEDIUM',   eta:'01:40' },
+  { id:'MSN-003', name:'Marine Border Guard',       domain:'Marine', status:'active',    units:2, progress:91, priority:'CRITICAL', eta:'00:22' },
+  { id:'MSN-004', name:'Operation Night Hawk',      domain:'Aerial', status:'scheduled', units:3, progress:0,  priority:'HIGH',     eta:'04:00' },
+  { id:'MSN-005', name:'Aerial Zone Clearance',     domain:'Aerial', status:'completed', units:2, progress:100,priority:'LOW',      eta:'DONE'  },
+  { id:'MSN-006', name:'Coastal Patrol Alpha',      domain:'Marine', status:'active',    units:1, progress:44, priority:'MEDIUM',   eta:'03:10' },
+  { id:'MSN-007', name:'Sector Echo Recon',         domain:'Land',   status:'active',    units:2, progress:30, priority:'HIGH',     eta:'05:00' },
+];
+
+const statusBadge = s => ({ active:'badge-green', scheduled:'badge-amber', completed:'badge-gray' }[s] || 'badge-gray');
+const prioBadge   = p => ({ CRITICAL:'badge-red', HIGH:'badge-amber', MEDIUM:'badge-blue', LOW:'badge-gray' }[p] || 'badge-gray');
+const domainIcon  = d => ({ Land:'fa-mountain', Marine:'fa-water', Aerial:'fa-helicopter' }[d] || 'fa-crosshairs');
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sidebar-mount').innerHTML = buildSidebar('missions');
+  document.getElementById('topbar-mount').innerHTML  = buildTopbar('Mission Control', 'Operations Center — All Domains Active');
+  initComponents();
+  AOS.init({ duration:500, once:true });
+
+  // Mission table
+  document.getElementById('mission-tbody').innerHTML = MISSIONS.map(m => `
+    <tr>
+      <td class="text-green">${m.id}</td>
+      <td style="color:var(--text-primary);font-weight:600">${m.name}</td>
+      <td><span class="badge-military badge-blue"><i class="fa-solid ${domainIcon(m.domain)} me-1"></i>${m.domain}</span></td>
+      <td><span class="badge-military ${statusBadge(m.status)}">${m.status.toUpperCase()}</span></td>
+      <td class="text-green">${m.units}</td>
+      <td style="min-width:120px">
+        <div class="d-flex align-items-center gap-2">
+          <div class="prog-bar-wrap" style="width:80px">
+            <div class="prog-bar ${m.progress===100?'green':m.progress>60?'blue':'amber'}" style="width:${m.progress}%"></div>
+          </div>
+          <span class="mono" style="font-size:10px;color:var(--text-secondary)">${m.progress}%</span>
+        </div>
+      </td>
+      <td><span class="badge-military ${prioBadge(m.priority)}">${m.priority}</span></td>
+      <td class="mono" style="font-size:10px;color:var(--text-muted)">${m.eta}</td>
+      <td>
+        <div class="d-flex gap-2">
+          <button class="btn-mil btn-mil-blue" style="padding:3px 8px;font-size:8px"><i class="fa-solid fa-eye"></i></button>
+          <button class="btn-mil btn-mil-red" style="padding:3px 8px;font-size:8px"><i class="fa-solid fa-stop"></i></button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  // Timeline
+  document.getElementById('mc-timeline').innerHTML = `<div class="timeline">${MISSIONS.slice(0,5).map(m=>`
+    <div class="timeline-item ${m.status==='active'?'':'amber'}">
+      <div class="timeline-title">${m.name}</div>
+      <div class="timeline-meta">${m.units} unit${m.units>1?'s':''} · ${m.status.toUpperCase()} · ${m.progress}%</div>
+      ${m.status==='active'?`<div class="prog-bar-wrap mt-1" style="height:3px"><div class="prog-bar green" style="width:${m.progress}%"></div></div>`:''}
+    </div>`).join('')}</div>`;
+
+  // Analytics chart
+  new Chart(document.getElementById('missionAnalyticsChart'), {
+    type:'bar',
+    data:{ labels:['Jan','Feb','Mar','Apr','May','Jun'],
+      datasets:[
+        { label:'Land',   data:[12,15,18,14,20,22], backgroundColor:'rgba(0,255,65,.7)',  borderRadius:3 },
+        { label:'Aerial', data:[5,7,9,6,11,13],     backgroundColor:'rgba(0,212,255,.7)', borderRadius:3 },
+        { label:'Marine', data:[3,4,6,5,7,8],        backgroundColor:'rgba(255,184,0,.7)', borderRadius:3 },
+      ]},
+    options:{ responsive:true, plugins:{legend:{labels:{padding:10,boxWidth:10}}},
+      scales:{ x:{grid:{color:'rgba(26,46,26,.4)'}}, y:{grid:{color:'rgba(26,46,26,.4)'},beginAtZero:true} } }
+  });
+
+  // Domain pie
+  new Chart(document.getElementById('domainPieChart'), {
+    type:'doughnut',
+    data:{ labels:['Land','Marine','Aerial'],
+      datasets:[{ data:[7,4,5], backgroundColor:['#00ff41','#ffb800','#00d4ff'], borderWidth:1, borderColor:'#0a0f0a' }]},
+    options:{ responsive:true, cutout:'60%', plugins:{legend:{position:'bottom',labels:{padding:8,boxWidth:10}}} }
+  });
+});
+</script>
+</body>
+</html>

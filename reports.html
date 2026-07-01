@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Reports</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <div class="page-content">
+
+      <!-- Report type selector -->
+      <div class="row g-3 mb-4">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-chart-bar"></i> Analytics & Reports</div>
+              <div class="d-flex gap-2">
+                <button class="btn-mil btn-mil-green" onclick="exportReport('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                <button class="btn-mil btn-mil-blue"  onclick="exportReport('csv')"><i class="fa-solid fa-file-csv"></i> CSV</button>
+                <button class="btn-mil btn-mil-amber" onclick="exportReport('excel')"><i class="fa-solid fa-file-excel"></i> Excel</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="d-flex gap-2 flex-wrap">
+                <button class="btn-mil btn-mil-green report-tab active" onclick="switchReport(this,'threat')"><i class="fa-solid fa-skull-crossbones"></i> Threat Analysis</button>
+                <button class="btn-mil btn-mil-green report-tab" onclick="switchReport(this,'mission')"><i class="fa-solid fa-crosshairs"></i> Mission Analytics</button>
+                <button class="btn-mil btn-mil-green report-tab" onclick="switchReport(this,'robot')"><i class="fa-solid fa-robot"></i> Robot Analytics</button>
+                <button class="btn-mil btn-mil-green report-tab" onclick="switchReport(this,'battery')"><i class="fa-solid fa-battery-half"></i> Battery Analytics</button>
+                <button class="btn-mil btn-mil-green report-tab" onclick="switchReport(this,'sensor')"><i class="fa-solid fa-microchip"></i> Sensor Analytics</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI row -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3" data-aos="fade-up"><div class="stat-card red"><div class="stat-label">Total Threats</div><div class="stat-value" data-count="247">0</div><div class="stat-sub">This month</div><div class="stat-trend down"><i class="fa-solid fa-arrow-trend-up"></i> +18%</div><div class="stat-icon-wrap"><i class="fa-solid fa-shield-halved"></i></div></div></div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="50"><div class="stat-card blue"><div class="stat-label">Avg Response</div><div class="stat-value" style="font-size:24px">4.2s</div><div class="stat-sub">Incident response</div><div class="stat-trend up"><i class="fa-solid fa-arrow-trend-down"></i> -8%</div><div class="stat-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div></div></div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100"><div class="stat-card green"><div class="stat-label">System Score</div><div class="stat-value" style="font-size:24px">94</div><div class="stat-sub">Out of 100</div><div class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> +2</div><div class="stat-icon-wrap"><i class="fa-solid fa-star"></i></div></div></div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="150"><div class="stat-card amber"><div class="stat-label">False Positive</div><div class="stat-value" style="font-size:24px">3.4%</div><div class="stat-sub">AI accuracy</div><div class="stat-trend up"><i class="fa-solid fa-arrow-trend-down"></i> -1.2%</div><div class="stat-icon-wrap"><i class="fa-solid fa-brain"></i></div></div></div>
+      </div>
+
+      <!-- Main charts -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-8" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-chart-area"></i> <span id="chart-main-title">Threat Detection — Monthly</span></div>
+            </div>
+            <div class="card-body"><canvas id="mainReportChart" height="220"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar"><div class="card-title text-blue"><i class="fa-solid fa-chart-pie"></i> Domain Breakdown</div></div>
+            <div class="card-body"><canvas id="domainPieChart" height="180"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heat map -->
+      <div class="row g-3 mb-4">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar"><div class="card-title text-amber"><i class="fa-solid fa-map"></i> Threat Heat Map — Weekly Activity</div></div>
+            <div class="card-body">
+              <div id="heat-map-grid" style="display:grid;grid-template-columns:repeat(24,1fr);gap:3px"></div>
+              <div class="d-flex align-items-center gap-2 mt-3">
+                <span class="mono" style="font-size:10px;color:var(--text-muted)">Low</span>
+                <div style="display:flex;gap:2px">
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,49,49,.1)"></div>
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,49,49,.25)"></div>
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,49,49,.45)"></div>
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,49,49,.65)"></div>
+                  <div style="width:12px;height:12px;border-radius:2px;background:rgba(255,49,49,.85)"></div>
+                </div>
+                <span class="mono" style="font-size:10px;color:var(--text-muted)">High</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary table -->
+      <div class="row g-3 mb-4">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar"><div class="card-title text-green"><i class="fa-solid fa-table"></i> Incident Summary Report</div><span class="badge-military badge-green mono" style="font-size:9px">Generated: <span id="report-time"></span></span></div>
+            <div class="card-body p-0">
+              <table class="military-table">
+                <thead><tr><th>Incident ID</th><th>Domain</th><th>Type</th><th>Severity</th><th>Unit</th><th>Zone</th><th>Date</th><th>Response</th><th>Status</th></tr></thead>
+                <tbody id="report-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+Chart.defaults.color='#4a6a4a';Chart.defaults.borderColor='#1a2e1a';Chart.defaults.font.family="'JetBrains Mono',monospace";Chart.defaults.font.size=10;
+
+let mainChart=null;
+
+const REPORT_DATA=[
+  {id:'INC-001',domain:'Land',type:'Human Intrusion',severity:'Critical',unit:'RVL-001',zone:'Sector Alpha',date:'2024-06-30',response:'3.2s',status:'resolved'},
+  {id:'INC-002',domain:'Marine',type:'Unauthorized Vessel',severity:'Critical',unit:'MRN-001',zone:'Marine Zone B',date:'2024-06-30',response:'4.8s',status:'active'},
+  {id:'INC-003',domain:'Drone',type:'Battery Critical',severity:'Warning',unit:'DRN-008',zone:'Sector Delta',date:'2024-06-30',response:'2.1s',status:'resolved'},
+  {id:'INC-004',domain:'Land',type:'Fire Detection',severity:'Critical',unit:'RVL-002',zone:'Sector Bravo',date:'2024-06-29',response:'1.5s',status:'resolved'},
+  {id:'INC-005',domain:'Marine',type:'Illegal Fishing',severity:'Warning',unit:'MRN-002',zone:'EEZ Boundary',date:'2024-06-29',response:'5.2s',status:'acknowledged'},
+  {id:'INC-006',domain:'Land',type:'Weapon Detection',severity:'Critical',unit:'RVL-001',zone:'Grid C7',date:'2024-06-28',response:'2.8s',status:'resolved'},
+  {id:'INC-007',domain:'Marine',type:'Oil Spill',severity:'Info',unit:'MRN-001',zone:'Coastal Zone 3',date:'2024-06-28',response:'8.0s',status:'monitoring'},
+];
+
+const CHARTS_CONFIG={
+  threat:{title:'Threat Detection — Monthly',labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[
+    {label:'Land',data:[42,55,38,62,48,67],borderColor:'#00ff41',backgroundColor:'rgba(0,255,65,.1)',fill:true,tension:.4,borderWidth:2},
+    {label:'Marine',data:[18,24,15,28,22,31],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.08)',fill:true,tension:.4,borderWidth:2},
+    {label:'Drone',data:[8,12,9,15,11,14],borderColor:'#b347ff',backgroundColor:'rgba(179,71,255,.07)',fill:true,tension:.4,borderWidth:2},
+  ]},
+  mission:{title:'Mission Completion — Monthly',labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[
+    {label:'Patrol',data:[12,15,18,14,20,22],borderColor:'#00ff41',backgroundColor:'rgba(0,255,65,.1)',fill:true,tension:.4,borderWidth:2},
+    {label:'Recon',data:[5,7,9,6,11,13],borderColor:'#00d4ff',fill:false,tension:.4,borderWidth:2},
+    {label:'Marine',data:[3,4,6,5,7,8],borderColor:'#ffb800',fill:false,tension:.4,borderWidth:2},
+  ]},
+  battery:{title:'Battery Consumption — Daily',labels:['00:00','04:00','08:00','12:00','16:00','20:00','24:00'],datasets:[
+    {label:'Avg %',data:[82,78,71,63,58,52,48],borderColor:'#00ff41',fill:false,tension:.4,borderWidth:2},
+    {label:'Min %',data:[55,48,38,28,22,15,10],borderColor:'#ff3131',borderDash:[4,4],fill:false,tension:.4,borderWidth:1.5},
+  ]},
+};
+
+function buildMainChart(type){
+  const cfg=CHARTS_CONFIG[type]||CHARTS_CONFIG.threat;
+  document.getElementById('chart-main-title').textContent=cfg.title;
+  const ctx=document.getElementById('mainReportChart');
+  if(mainChart){mainChart.destroy();}
+  mainChart=new Chart(ctx,{type:'line',data:{labels:cfg.labels,datasets:cfg.datasets},options:{responsive:true,plugins:{legend:{labels:{padding:12,boxWidth:10}}},scales:{x:{grid:{color:'rgba(26,46,26,.5)'}},y:{grid:{color:'rgba(26,46,26,.5)'},beginAtZero:true}}}});
+}
+
+function switchReport(btn,type){
+  document.querySelectorAll('.report-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildMainChart(type);
+}
+
+function exportReport(fmt){
+  alert(`Exporting report as ${fmt.toUpperCase()}...\n(Backend integration point)`);
+}
+
+function buildHeatMap(){
+  const grid=document.getElementById('heat-map-grid');
+  const hours=24,days=7;
+  const vals=Array.from({length:days},()=>Array.from({length:hours},()=>Math.random()));
+  grid.style.gridTemplateColumns=`repeat(${hours},1fr)`;
+  grid.style.gridTemplateRows=`repeat(${days},20px)`;
+  for(let d=0;d<days;d++){
+    for(let h=0;h<hours;h++){
+      const v=vals[d][h];
+      const cell=document.createElement('div');
+      cell.className='heatmap-cell';
+      cell.style.cssText=`height:20px;border-radius:3px;background:rgba(255,49,49,${(v*0.85).toFixed(2)})`;
+      cell.title=`Day ${d+1}, ${String(h).padStart(2,'0')}:00 — Intensity: ${(v*100).toFixed(0)}%`;
+      grid.appendChild(cell);
+    }
+  }
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('sidebar-mount').innerHTML=buildSidebar('reports');
+  document.getElementById('topbar-mount').innerHTML=buildTopbar('Reports & Analytics','Intelligence Reports — All Domains');
+  initComponents();AOS.init({duration:500,once:true});animateCounters();
+
+  buildMainChart('threat');
+  buildHeatMap();
+
+  document.getElementById('report-time').textContent=new Date().toLocaleString();
+
+  // Domain pie
+  const ctx2=document.getElementById('domainPieChart');
+  new Chart(ctx2,{type:'doughnut',data:{labels:['Land','Marine','Drone','Sensor'],datasets:[{data:[45,30,18,7],backgroundColor:['#00ff41','#00d4ff','#b347ff','#ffb800'],borderWidth:1,borderColor:'#0a0f0a'}]},options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{padding:8,boxWidth:10}}}}});
+
+  // Report table
+  const sc={Critical:'red',Warning:'amber',Info:'blue'};
+  const ss={resolved:'green',active:'red',acknowledged:'amber',monitoring:'blue'};
+  document.getElementById('report-tbody').innerHTML=REPORT_DATA.map(r=>`
+    <tr>
+      <td class="text-green">${r.id}</td>
+      <td><span class="badge-military badge-blue" style="font-size:9px">${r.domain}</span></td>
+      <td>${r.type}</td>
+      <td><span class="badge-military badge-${sc[r.severity]||'gray'}" style="font-size:9px">${r.severity}</span></td>
+      <td class="text-green">${r.unit}</td>
+      <td style="color:var(--text-muted)">${r.zone}</td>
+      <td class="mono" style="font-size:10px">${r.date}</td>
+      <td class="mono text-green" style="font-size:10px">${r.response}</td>
+      <td><span class="badge-military badge-${ss[r.status]||'gray'}" style="font-size:9px">${r.status.toUpperCase()}</span></td>
+    </tr>`).join('');
+});
+</script>
+</body>
+</html>

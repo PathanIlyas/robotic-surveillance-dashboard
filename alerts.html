@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Alert Center</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <style>
+    .alert-row{
+      padding:14px 18px;border-bottom:1px solid var(--border-color);
+      display:flex;align-items:flex-start;gap:14px;
+      transition:background .2s;cursor:pointer;
+    }
+    .alert-row:hover{background:rgba(0,255,65,.025);}
+    .alert-row.critical{border-left:3px solid var(--accent-red);}
+    .alert-row.warning{border-left:3px solid var(--accent-amber);}
+    .alert-row.info{border-left:3px solid var(--accent-blue);}
+    .alert-icon{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+    .alert-title{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
+    .alert-body{font-size:11px;color:var(--text-secondary);margin-bottom:6px;line-height:1.5;}
+    .alert-footer{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .alert-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+    .alert-actions{margin-left:auto;display:flex;gap:6px;flex-shrink:0;}
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <div class="page-content">
+
+      <!-- Alert stats -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3" data-aos="fade-up"><div class="stat-card red"><div class="stat-label">Critical</div><div class="stat-value" data-count="8">0</div><div class="stat-icon-wrap"><i class="fa-solid fa-skull-crossbones"></i></div></div></div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="50"><div class="stat-card amber"><div class="stat-label">Warning</div><div class="stat-value" data-count="14">0</div><div class="stat-icon-wrap"><i class="fa-solid fa-triangle-exclamation"></i></div></div></div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100"><div class="stat-card blue"><div class="stat-label">Info</div><div class="stat-value" data-count="19">0</div><div class="stat-icon-wrap"><i class="fa-solid fa-circle-info"></i></div></div></div>
+        <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="150"><div class="stat-card green"><div class="stat-label">Resolved</div><div class="stat-value" data-count="63">0</div><div class="stat-icon-wrap"><i class="fa-solid fa-check-circle"></i></div></div></div>
+      </div>
+
+      <!-- Chart + Filter row -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-8" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-amber"><i class="fa-solid fa-chart-bar"></i> 7-Day Alert Trends</div>
+            </div>
+            <div class="card-body"><canvas id="alertTrendChart" height="200"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar"><div class="card-title text-red"><i class="fa-solid fa-chart-pie"></i> Alert Distribution</div></div>
+            <div class="card-body"><canvas id="alertPieChart" height="200"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alert Center main panel -->
+      <div class="row g-3">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar" style="flex-wrap:wrap;gap:10px">
+              <div class="card-title text-red"><i class="fa-solid fa-bell"></i> Alert Center — Live Feed</div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Filter buttons -->
+                <button class="btn-mil btn-mil-red filter-btn active" data-filter="all"     onclick="filterAlerts(this,'all')"><i class="fa-solid fa-list"></i> All</button>
+                <button class="btn-mil btn-mil-red filter-btn"       data-filter="critical" onclick="filterAlerts(this,'critical')"><i class="fa-solid fa-skull-crossbones"></i> Critical</button>
+                <button class="btn-mil btn-mil-amber filter-btn"     data-filter="warning"  onclick="filterAlerts(this,'warning')"><i class="fa-solid fa-triangle-exclamation"></i> Warning</button>
+                <button class="btn-mil btn-mil-blue filter-btn"      data-filter="info"     onclick="filterAlerts(this,'info')"><i class="fa-solid fa-circle-info"></i> Info</button>
+                <button class="btn-mil btn-mil-green"                                        onclick="acknowledgeAll()"><i class="fa-solid fa-check-double"></i> Ack All</button>
+              </div>
+            </div>
+            <div id="alert-list-container" style="max-height:600px;overflow-y:auto"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+Chart.defaults.color='#4a6a4a';Chart.defaults.borderColor='#1a2e1a';Chart.defaults.font.family="'JetBrains Mono',monospace";Chart.defaults.font.size=10;
+
+const ALERTS_DATA=[
+  {id:'ALT-001',type:'critical',icon:'fa-triangle-exclamation',iconColor:'red',title:'Human Detected Near Border',body:'Human figure detected crossing restricted perimeter at Sector Alpha, Grid C7. AI confidence: 97.3%. Immediate response recommended.',unit:'RVL-001',zone:'Sector Alpha',time:'14:32:18',status:'active',domain:'Land'},
+  {id:'ALT-002',type:'critical',icon:'fa-ship',iconColor:'red',title:'Unauthorized Boat Entered Zone',body:'Unregistered vessel MV-UNKNOWN entered restricted maritime zone. Speed: 24 knots. Heading: NW. Possible smuggling activity.',unit:'MRN-001',zone:'Marine Zone B',time:'14:28:45',status:'active',domain:'Marine'},
+  {id:'ALT-003',type:'warning',icon:'fa-helicopter',iconColor:'amber',title:'Drone Battery Low — DRN-006',body:'DRN-006 KESTREL battery at 29%. Recommend immediate return to base or emergency charging. ETA to base: 8 minutes.',unit:'DRN-006',zone:'Sector Delta',time:'14:25:12',status:'active',domain:'Drone'},
+  {id:'ALT-004',type:'critical',icon:'fa-fire',iconColor:'red',title:'Fire Detected — Thermal Signature',body:'Thermal imaging shows fire signature at Coordinates N34.07, W118.26. Temperature delta: +72°C above ambient. Possible arson.',unit:'RVL-002',zone:'Sector Bravo',time:'14:19:33',status:'active',domain:'Land'},
+  {id:'ALT-005',type:'warning',icon:'fa-fish',iconColor:'amber',title:'Illegal Fishing Activity',body:'Unauthorized fishing vessel detected in EEZ. Net deployment confirmed. Vessel registration: Unknown. Coordinates logged.',unit:'MRN-002',zone:'EEZ Boundary',time:'14:15:07',status:'acknowledged',domain:'Marine'},
+  {id:'ALT-006',type:'critical',icon:'fa-person-falling-burst',iconColor:'red',title:'Human Overboard Detected',body:'AI detection confirmed person in water. Marine Sector 5. Coordinates: 22.4°N 118.7°W. Search and rescue protocol activated.',unit:'MRN-003',zone:'Marine Sector 5',time:'14:10:22',status:'active',domain:'Marine'},
+  {id:'ALT-007',type:'info',icon:'fa-microchip',iconColor:'blue',title:'Sensor Offline — Ultrasonic Unit 3',body:'Ultrasonic proximity sensor on RVL-004 is offline. Health: 67%. Possible hardware fault. Unit operating in degraded mode.',unit:'RVL-004',zone:'Maintenance Bay',time:'14:05:55',status:'acknowledged',domain:'Land'},
+  {id:'ALT-008',type:'critical',icon:'fa-satellite-dish',iconColor:'red',title:'Communication Lost — RVL-004',body:'All communication channels lost with Delta Unit. Last known position: Sector Echo, Remote Post. Emergency beacon activated.',unit:'RVL-004',zone:'Sector Echo',time:'14:01:41',status:'active',domain:'Land'},
+  {id:'ALT-009',type:'warning',icon:'fa-gun',iconColor:'amber',title:'Weapon Signature Detected',body:'AI weapon detection module identified possible firearm at Grid C7. Confidence: 96.2%. Alerting response team.',unit:'RVL-001',zone:'Grid C7',time:'13:58:30',status:'resolved',domain:'Land'},
+  {id:'ALT-010',type:'info',icon:'fa-droplet',iconColor:'blue',title:'Oil Spill Signature Detected',body:'Chemical sensors indicate potential hydrocarbon spill near Coastal Zone 3. Buoy 12 data confirmed. Coast Guard notified.',unit:'MRN-001',zone:'Coastal Zone 3',time:'13:45:18',status:'resolved',domain:'Marine'},
+];
+
+let currentFilter='all';
+
+function renderAlerts(filter){
+  const container=document.getElementById('alert-list-container');
+  const data=filter==='all'?ALERTS_DATA:ALERTS_DATA.filter(a=>a.type===filter);
+  if(!data.length){container.innerHTML='<div style="padding:40px;text-align:center;color:var(--text-muted);font-family:var(--font-mono);font-size:12px">No alerts match filter</div>';return;}
+  const statusColor={active:'red',acknowledged:'amber',resolved:'green'};
+  const iconBg={red:'rgba(255,49,49,.12)',amber:'rgba(255,184,0,.12)',blue:'rgba(0,212,255,.12)'};
+  container.innerHTML=data.map(a=>`
+    <div class="alert-row ${a.type}" id="alert-${a.id}">
+      <div class="alert-icon" style="background:${iconBg[a.iconColor]}">
+        <i class="fa-solid ${a.icon}" style="font-size:15px;color:var(--accent-${a.iconColor==='red'?'red':a.iconColor==='amber'?'amber':'blue'})"></i>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-body">${a.body}</div>
+        <div class="alert-footer">
+          <div class="alert-meta"><i class="fa-solid fa-robot"></i> ${a.unit}</div>
+          <div class="alert-meta"><i class="fa-solid fa-location-dot"></i> ${a.zone}</div>
+          <div class="alert-meta"><i class="fa-regular fa-clock"></i> ${a.time}</div>
+          <div class="alert-meta"><i class="fa-solid fa-globe"></i> ${a.domain}</div>
+          <span class="badge-military badge-${statusColor[a.status]}" style="font-size:8px">${a.status.toUpperCase()}</span>
+          <div class="alert-actions">
+            ${a.status==='active'?`<button class="btn-mil btn-mil-amber" style="padding:3px 8px;font-size:9px" onclick="ackAlert('${a.id}',this)"><i class="fa-solid fa-check"></i> ACK</button>`:''}
+            ${a.status!=='resolved'?`<button class="btn-mil btn-mil-green" style="padding:3px 8px;font-size:9px" onclick="resolveAlert('${a.id}',this)"><i class="fa-solid fa-check-double"></i> Resolve</button>`:''}
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterAlerts(btn,filter){
+  currentFilter=filter;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAlerts(filter);
+}
+
+function ackAlert(id,btn){
+  const alert=ALERTS_DATA.find(a=>a.id===id);
+  if(alert){alert.status='acknowledged';renderAlerts(currentFilter);}
+}
+
+function resolveAlert(id,btn){
+  const alert=ALERTS_DATA.find(a=>a.id===id);
+  if(alert){alert.status='resolved';renderAlerts(currentFilter);}
+}
+
+function acknowledgeAll(){
+  ALERTS_DATA.filter(a=>a.status==='active').forEach(a=>a.status='acknowledged');
+  renderAlerts(currentFilter);
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('sidebar-mount').innerHTML=buildSidebar('alerts');
+  document.getElementById('topbar-mount').innerHTML=buildTopbar('Alert Center','Real-Time Incident Management');
+  initComponents();AOS.init({duration:500,once:true});animateCounters();
+  renderAlerts('all');
+
+  // Trend chart
+  const ctx=document.getElementById('alertTrendChart');
+  new Chart(ctx,{type:'bar',data:{
+    labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    datasets:[
+      {label:'Critical',data:[4,6,2,8,3,5,1],backgroundColor:'rgba(255,49,49,.75)',borderRadius:3},
+      {label:'Warning', data:[7,5,10,6,9,4,3],backgroundColor:'rgba(255,184,0,.75)',borderRadius:3},
+      {label:'Info',    data:[12,9,15,11,8,6,4],backgroundColor:'rgba(0,212,255,.75)',borderRadius:3},
+    ]
+  },options:{responsive:true,plugins:{legend:{labels:{padding:10,boxWidth:10}}},scales:{x:{grid:{color:'rgba(26,46,26,.4)'},stacked:true},y:{grid:{color:'rgba(26,46,26,.4)'},beginAtZero:true,stacked:true}}}});
+
+  const ctx2=document.getElementById('alertPieChart');
+  new Chart(ctx2,{type:'doughnut',data:{labels:['Land','Marine','Drone','Sensor'],datasets:[{data:[42,28,18,12],backgroundColor:['#ff3131','#00d4ff','#b347ff','#ffb800'],borderWidth:1,borderColor:'#0a0f0a'}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{padding:8,boxWidth:10}}}}});
+});
+</script>
+</body>
+</html>

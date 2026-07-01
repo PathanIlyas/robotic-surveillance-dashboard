@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Land Surveillance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <div class="page-content">
+
+      <!-- Detection Feature Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-12"><h6 class="mono text-green" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.7">Land Detection Modules</h6></div>
+        <script>
+          const LAND_MODULES = [
+            { icon:'fa-person', label:'Human Detection',    count:38, color:'red',    status:'active' },
+            { icon:'fa-car',    label:'Vehicle Detection',  count:24, color:'amber',  status:'active' },
+            { icon:'fa-user-secret',label:'Intrusion Alert',count:12, color:'red',    status:'active' },
+            { icon:'fa-gun',    label:'Weapon Detection',   count:3,  color:'purple', status:'active' },
+            { icon:'fa-fire',   label:'Fire Detection',     count:2,  color:'amber',  status:'active' },
+            { icon:'fa-moon',   label:'Night Vision',       count:18, color:'blue',   status:'active' },
+            { icon:'fa-temperature-high',label:'Thermal',   count:45, color:'green',  status:'active' },
+            { icon:'fa-satellite',label:'GPS Tracking',     count:12, color:'green',  status:'active' },
+          ];
+          document.write(LAND_MODULES.map(m=>`
+            <div class="col-6 col-md-3 col-lg-3" data-aos="fade-up">
+              <div class="stat-card ${m.color}">
+                <div class="stat-label">${m.label}</div>
+                <div class="stat-value" style="font-size:26px" data-count="${m.count}">0</div>
+                <div class="stat-sub d-flex align-items-center gap-2 mt-1">
+                  <span class="status-dot ${m.status === 'active' ? 'online' : 'offline'}"></span>
+                  ${m.status.toUpperCase()}
+                </div>
+                <div class="stat-icon-wrap"><i class="fa-solid ${m.icon}"></i></div>
+              </div>
+            </div>`).join(''));
+        </script>
+      </div>
+
+      <!-- Camera Feeds -->
+      <div class="row g-3 mb-4">
+        <div class="col-12"><div class="d-flex align-items-center justify-content-between">
+          <h6 class="mono text-green" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.7">Live Camera Grid</h6>
+          <span class="badge-military badge-red" style="font-size:9px"><span class="status-dot danger" style="width:5px;height:5px"></span> 4 FEEDS LIVE</span>
+        </div></div>
+
+        <div class="col-12 col-md-6 col-lg-8" data-aos="fade-up">
+          <!-- Primary cam -->
+          <div class="camera-feed" style="height:340px;background:linear-gradient(135deg,#030a03,#050f05)">
+            <div class="camera-scan-line"></div>
+            <div class="camera-overlay">
+              <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+              <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+            </div>
+            <!-- Detection boxes -->
+            <div class="cam-detection-box" style="top:30%;left:22%;width:120px;height:90px">
+              <span class="cam-det-label">HUMAN 97.3%</span>
+            </div>
+            <div class="cam-detection-box" style="top:45%;left:58%;width:80px;height:50px;border-color:var(--accent-blue)">
+              <span class="cam-det-label" style="color:var(--accent-blue)">VEHICLE 92.1%</span>
+            </div>
+            <!-- Reticle -->
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border:1px solid rgba(0,255,65,.3);border-radius:50%;pointer-events:none">
+              <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(0,255,65,.3);transform:translateY(-50%)"></div>
+              <div style="position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(0,255,65,.3);transform:translateX(-50%)"></div>
+            </div>
+            <div class="cam-label">CAM-01 | RVL-001 | DAY MODE</div>
+            <div class="cam-live-badge"><div class="cam-live-dot"></div> REC</div>
+            <!-- Thermal sim overlay -->
+            <div style="position:absolute;top:25%;left:20%;width:40px;height:60px;background:radial-gradient(circle,rgba(255,107,0,.3),transparent);border-radius:50%;pointer-events:none"></div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="50">
+          <div class="row g-2 h-100">
+            <div class="col-12">
+              <div class="camera-feed" style="height:160px;background:linear-gradient(135deg,#020505,#030a08)">
+                <div class="camera-scan-line" style="animation-duration:4s;animation-delay:1s"></div>
+                <div class="camera-overlay">
+                  <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+                  <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.15">
+                  <i class="fa-solid fa-temperature-high" style="font-size:40px;color:var(--accent-red)"></i>
+                </div>
+                <div class="cam-label">CAM-02 | RVL-002 | THERMAL</div>
+                <div class="cam-live-badge"><div class="cam-live-dot"></div> LIVE</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="camera-feed" style="height:160px;background:linear-gradient(135deg,#010203,#020408)">
+                <div class="camera-scan-line" style="animation-duration:5s;animation-delay:2s"></div>
+                <div class="camera-overlay">
+                  <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+                  <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.1">
+                  <i class="fa-solid fa-moon" style="font-size:40px;color:var(--accent-purple)"></i>
+                </div>
+                <div class="cam-label">CAM-03 | RVL-003 | NIGHT IR</div>
+                <div class="cam-live-badge"><div class="cam-live-dot"></div> LIVE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threat Timeline Chart + Land robots table -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-7" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-red"><i class="fa-solid fa-chart-area"></i> Land Threat Detection — 24H</div>
+            </div>
+            <div class="card-body"><canvas id="landThreatChart" height="220"></canvas></div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-5" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-robot"></i> Land Robot Status</div>
+            </div>
+            <div class="card-body">
+              <div id="land-robot-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+Chart.defaults.color='#4a6a4a';Chart.defaults.borderColor='#1a2e1a';Chart.defaults.font.family="'JetBrains Mono',monospace";Chart.defaults.font.size=10;
+
+const LAND_ROBOTS = [
+  { id:'RVL-001', name:'Alpha Unit',  battery:87, signal:94, mission:'Perimeter Patrol', status:'active'  },
+  { id:'RVL-002', name:'Bravo Unit',  battery:62, signal:78, mission:'Thermal Scan',     status:'active'  },
+  { id:'RVL-003', name:'Charlie Unit',battery:100,signal:99, mission:'Standby',          status:'idle'    },
+  { id:'RVL-004', name:'Delta Unit',  battery:12, signal:0,  mission:'Maintenance',      status:'offline' },
+];
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sidebar-mount').innerHTML = buildSidebar('land');
+  document.getElementById('topbar-mount').innerHTML  = buildTopbar('Land Surveillance', 'Ground-Level Monitoring — All Sectors Active');
+  initComponents();
+  AOS.init({ duration:500, once:true });
+  animateCounters();
+  animateProgressBars();
+
+  // Land robot list
+  const el = document.getElementById('land-robot-list');
+  const bc = b => b > 60 ? 'green' : b > 30 ? 'amber' : 'red';
+  el.innerHTML = LAND_ROBOTS.map(r => `
+    <div class="d-flex align-items-center justify-content-between mb-3 pb-3" style="border-bottom:1px solid var(--border-color)">
+      <div class="d-flex align-items-center gap-3">
+        <div class="activity-icon-wrap ${r.status==='active'?'green':r.status==='idle'?'amber':'red'}" style="width:32px;height:32px;border-radius:8px">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <div class="mono" style="font-size:11px;color:var(--text-primary);font-weight:600">${r.id} · ${r.name}</div>
+          <div class="mono" style="font-size:9px;color:var(--text-muted)">${r.mission}</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="mono text-${bc(r.battery)}" style="font-size:12px;font-weight:700">${r.battery}%</div>
+        <div class="prog-bar-wrap" style="width:60px;margin-top:4px">
+          <div class="prog-bar ${bc(r.battery)}" style="width:${r.battery}%"></div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Land threat chart
+  const ctx = document.getElementById('landThreatChart');
+  new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:['00','02','04','06','08','10','12','14','16','18','20','22'],
+      datasets:[
+        { label:'Human',   data:[2,1,0,3,7,9,12,11,8,6,4,3], borderColor:'#ff3131', backgroundColor:'rgba(255,49,49,.1)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+        { label:'Vehicle', data:[1,0,0,2,5,8,10,9,7,5,3,2], borderColor:'#ffb800', backgroundColor:'rgba(255,184,0,.07)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+        { label:'Weapon',  data:[0,0,0,0,1,1,2,1,0,1,0,0],  borderColor:'#b347ff', backgroundColor:'rgba(179,71,255,.07)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+      ]
+    },
+    options:{ responsive:true, plugins:{legend:{labels:{padding:12,boxWidth:10}}}, scales:{ x:{grid:{color:'rgba(26,46,26,.5)'}}, y:{grid:{color:'rgba(26,46,26,.5)'},beginAtZero:true} } }
+  });
+});
+</script>
+</body>
+</html>

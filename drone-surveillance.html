@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Drone Surveillance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <div class="page-content">
+      <!-- Drone stat cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up">
+          <div class="stat-card blue"><div class="stat-label">Total Drones</div><div class="stat-value" data-count="8">0</div><div class="stat-sub">Fleet registered</div><div class="stat-icon-wrap"><i class="fa-solid fa-helicopter"></i></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="50">
+          <div class="stat-card green"><div class="stat-label">Airborne</div><div class="stat-value" data-count="6">0</div><div class="stat-sub">Active flights</div><div class="stat-icon-wrap"><i class="fa-solid fa-plane-departure"></i></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="100">
+          <div class="stat-card amber"><div class="stat-label">Max Altitude</div><div class="stat-value" style="font-size:22px">580m</div><div class="stat-sub">DRN-003 CONDOR</div><div class="stat-icon-wrap"><i class="fa-solid fa-arrow-up"></i></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="150">
+          <div class="stat-card purple"><div class="stat-label">Auto Patrol</div><div class="stat-value" data-count="4">0</div><div class="stat-sub">Active routes</div><div class="stat-icon-wrap"><i class="fa-solid fa-route"></i></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="200">
+          <div class="stat-card green"><div class="stat-label">Target Lock</div><div class="stat-value" data-count="3">0</div><div class="stat-sub">Objects tracked</div><div class="stat-icon-wrap"><i class="fa-solid fa-crosshairs"></i></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2" data-aos="fade-up" data-aos-delay="250">
+          <div class="stat-card red"><div class="stat-label">No-Fly Zones</div><div class="stat-value" data-count="5">0</div><div class="stat-sub">Active restrictions</div><div class="stat-icon-wrap"><i class="fa-solid fa-ban"></i></div></div>
+        </div>
+      </div>
+
+      <!-- Drone Fleet Cards -->
+      <div class="row g-3 mb-4" id="fleet">
+        <div class="col-12"><h6 class="mono text-blue" style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.7">Drone Fleet Status</h6></div>
+        <div id="drone-fleet-row" class="col-12">
+          <div class="row g-3" id="drone-cards"></div>
+        </div>
+      </div>
+
+      <!-- Live Drone Feed + Map -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-7" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-video"></i> Live Drone Feed — DRN-001 EAGLE</div>
+              <span class="badge-military badge-red"><span class="cam-live-dot" style="width:6px;height:6px;display:inline-block;border-radius:50%;background:var(--accent-red);animation:pulse-dot 1s infinite"></span> LIVE</span>
+            </div>
+            <div class="card-body p-0">
+              <div class="camera-feed" style="height:300px;background:linear-gradient(160deg,#010408,#020810,#030a05)">
+                <div class="camera-scan-line"></div>
+                <div class="camera-overlay">
+                  <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+                  <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+                </div>
+                <!-- HUD overlays -->
+                <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:10px;color:rgba(0,212,255,.8);background:rgba(0,0,0,.5);padding:3px 10px;border-radius:4px;letter-spacing:.06em">
+                  ALT: 250m &nbsp;|&nbsp; SPD: 45 km/h &nbsp;|&nbsp; HDG: 045°
+                </div>
+                <div class="cam-detection-box" style="top:35%;left:30%;width:90px;height:70px">
+                  <span class="cam-det-label">HUMAN 97.3%</span>
+                </div>
+                <div class="cam-detection-box" style="top:55%;left:60%;width:110px;height:55px;border-color:var(--accent-blue)">
+                  <span class="cam-det-label" style="color:var(--accent-blue)">VEHICLE 92.1%</span>
+                </div>
+                <!-- Drone HUD crosshair -->
+                <div style="position:absolute;bottom:14px;right:14px;width:50px;height:50px;border:1px solid rgba(0,212,255,.4);border-radius:50%;pointer-events:none">
+                  <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(0,212,255,.4)"></div>
+                  <div style="position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(0,212,255,.4)"></div>
+                </div>
+                <div class="cam-label" style="color:var(--accent-blue)">DRN-001 EAGLE · OBJECT DETECT MODE</div>
+                <div class="cam-live-badge"><div class="cam-live-dot"></div> REC 01:42:18</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drone altitude/speed chart -->
+        <div class="col-12 col-lg-5" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-header-bar">
+              <div class="card-title text-blue"><i class="fa-solid fa-chart-line"></i> Flight Telemetry — DRN-001</div>
+            </div>
+            <div class="card-body"><canvas id="droneTelemChart" height="200"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mission + No-fly zones info -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-purple"><i class="fa-solid fa-route"></i> Drone Mission Planning</div>
+              <button class="btn-mil btn-mil-blue" style="padding:4px 10px;font-size:9px"><i class="fa-solid fa-plus"></i> New Mission</button>
+            </div>
+            <div class="card-body">
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-title">Auto-Patrol Route A</div>
+                  <div class="timeline-meta">DRN-001 EAGLE · 12 waypoints · ETA 22 min</div>
+                </div>
+                <div class="timeline-item blue">
+                  <div class="timeline-title">Target Tracking — Vehicle-007</div>
+                  <div class="timeline-meta">DRN-002 HAWK · Active tracking · Sector Delta</div>
+                </div>
+                <div class="timeline-item amber">
+                  <div class="timeline-title">Border Scan Route B</div>
+                  <div class="timeline-meta">DRN-003 CONDOR · 580m altitude · 68% complete</div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-title">Thermal Survey Zone 4</div>
+                  <div class="timeline-meta">DRN-004 FALCON · Scheduled 16:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card">
+            <div class="card-header-bar">
+              <div class="card-title text-red"><i class="fa-solid fa-ban"></i> No-Fly Zone Violations</div>
+            </div>
+            <div class="card-body p-0">
+              <table class="military-table">
+                <thead><tr><th>Zone</th><th>Status</th><th>Radius</th><th>Drones Affected</th></tr></thead>
+                <tbody>
+                  <tr><td class="text-red">NFZ-Alpha</td><td><span class="badge-military badge-red">ACTIVE</span></td><td>2km</td><td>DRN-001, DRN-005</td></tr>
+                  <tr><td class="text-red">NFZ-Bravo</td><td><span class="badge-military badge-red">ACTIVE</span></td><td>5km</td><td>All drones</td></tr>
+                  <tr><td class="text-amber">NFZ-Charlie</td><td><span class="badge-military badge-amber">SCHEDULED</span></td><td>1km</td><td>DRN-003</td></tr>
+                  <tr><td class="text-green">NFZ-Delta</td><td><span class="badge-military badge-green">CLEARED</span></td><td>3km</td><td>None</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+Chart.defaults.color='#4a6a4a';Chart.defaults.borderColor='#1a2e1a';Chart.defaults.font.family="'JetBrains Mono',monospace";Chart.defaults.font.size=10;
+
+const DRONES = [
+  { id:'DRN-001', name:'Eagle',   battery:71, signal:88, alt:250, speed:45, status:'active',  mission:'Object Detect' },
+  { id:'DRN-002', name:'Hawk',    battery:55, signal:82, alt:180, speed:38, status:'active',  mission:'Auto Patrol'   },
+  { id:'DRN-003', name:'Condor',  battery:83, signal:79, alt:580, speed:52, status:'active',  mission:'Border Scan'   },
+  { id:'DRN-004', name:'Falcon',  battery:100,signal:98, alt:0,   speed:0,  status:'idle',    mission:'Standby'       },
+  { id:'DRN-005', name:'Osprey',  battery:42, signal:71, alt:320, speed:30, status:'active',  mission:'Thermal Scan'  },
+  { id:'DRN-006', name:'Kestrel', battery:29, signal:60, alt:150, speed:22, status:'active',  mission:'Target Track'  },
+  { id:'DRN-007', name:'Merlin',  battery:90, signal:95, alt:0,   speed:0,  status:'idle',    mission:'Charging'      },
+  { id:'DRN-008', name:'Raptor',  battery:5,  signal:0,  alt:0,   speed:0,  status:'offline', mission:'Battery Critical'},
+];
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sidebar-mount').innerHTML = buildSidebar('drone');
+  document.getElementById('topbar-mount').innerHTML  = buildTopbar('Drone Surveillance','Aerial Domain — 6 Drones Airborne');
+  initComponents(); AOS.init({duration:500,once:true}); animateCounters(); animateProgressBars();
+
+  const bc = b => b>60?'green':b>30?'amber':'red';
+  document.getElementById('drone-cards').innerHTML = DRONES.map(d=>`
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="glass-card p-0" style="border-color:${d.status==='active'?'rgba(0,212,255,.2)':d.status==='offline'?'rgba(255,49,49,.2)':'rgba(255,184,0,.2)'}">
+        <div class="card-header-bar">
+          <div class="d-flex align-items-center gap-2">
+            <div class="activity-icon-wrap blue" style="width:28px;height:28px;border-radius:7px;animation:${d.status==='active'?'drone-move 8s ease-in-out infinite':'none'}">
+              <i class="fa-solid fa-helicopter" style="font-size:11px"></i>
+            </div>
+            <div>
+              <div class="mono" style="font-size:11px;font-weight:700;color:var(--accent-blue)">${d.id}</div>
+              <div class="mono" style="font-size:9px;color:var(--text-muted)">${d.name}</div>
+            </div>
+          </div>
+          <span class="badge-military badge-${d.status==='active'?'blue':d.status==='idle'?'amber':'red'}" style="font-size:8px">${d.status.toUpperCase()}</span>
+        </div>
+        <div class="card-body">
+          <div class="row g-2 mb-2">
+            <div class="col-6"><div class="mono" style="font-size:9px;color:var(--text-muted)">ALTITUDE</div><div class="mono text-blue" style="font-size:13px;font-weight:700">${d.alt}m</div></div>
+            <div class="col-6"><div class="mono" style="font-size:9px;color:var(--text-muted)">SPEED</div><div class="mono text-green" style="font-size:13px;font-weight:700">${d.speed} km/h</div></div>
+          </div>
+          <div class="mono" style="font-size:9px;color:var(--text-muted);margin-bottom:4px">BATTERY</div>
+          <div class="d-flex align-items-center gap-2">
+            <div class="prog-bar-wrap flex-fill"><div class="prog-bar ${bc(d.battery)}" style="width:${d.battery}%"></div></div>
+            <span class="mono text-${bc(d.battery)}" style="font-size:10px">${d.battery}%</span>
+          </div>
+          <div class="mono mt-2" style="font-size:9px;color:var(--text-muted)">${d.mission}</div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  const ctx = document.getElementById('droneTelemChart');
+  const labels = Array.from({length:20},(_,i)=>i+'s');
+  new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Alt (m)', data:Array.from({length:20},()=>220+Math.random()*60),borderColor:'#00d4ff',fill:false,tension:.4,borderWidth:2,pointRadius:0},
+    {label:'Spd (km/h)',data:Array.from({length:20},()=>38+Math.random()*15),borderColor:'#00ff41',fill:false,tension:.4,borderWidth:2,pointRadius:0,yAxisID:'y2'},
+  ]},options:{responsive:true,plugins:{legend:{labels:{padding:10,boxWidth:10}}},scales:{x:{grid:{color:'rgba(26,46,26,.4)'}},y:{grid:{color:'rgba(26,46,26,.4)'}},y2:{position:'right',grid:{display:false}}}}});
+});
+</script>
+</body>
+</html>

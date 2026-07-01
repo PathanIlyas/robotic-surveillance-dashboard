@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sentinel-X | Settings</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/main.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <style>
+    .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(26,46,26,.5);}
+    .setting-row:last-child{border-bottom:none;}
+    .setting-label{font-size:13px;font-weight:500;color:var(--text-primary);}
+    .setting-desc{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:2px;}
+    .toggle{position:relative;width:40px;height:20px;flex-shrink:0;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .toggle-track{position:absolute;inset:0;background:var(--border-color);border-radius:20px;transition:background .3s;cursor:pointer;}
+    .toggle input:checked+.toggle-track{background:rgba(0,255,65,.4);}
+    .toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#666;transition:all .3s;}
+    .toggle input:checked+.toggle-track::after{left:23px;background:var(--accent-green);box-shadow:0 0 6px rgba(0,255,65,.5);}
+    .mil-input{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:7px 12px;color:var(--text-primary);font-family:var(--font-mono);font-size:11px;outline:none;width:100%;transition:border-color .2s;}
+    .mil-input:focus{border-color:rgba(0,255,65,.3);}
+    .mil-select{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:6px;padding:7px 12px;color:var(--text-primary);font-family:var(--font-mono);font-size:11px;outline:none;cursor:pointer;transition:border-color .2s;}
+    .mil-select:focus{border-color:rgba(0,255,65,.3);}
+    .settings-section-title{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div id="sidebar-mount"></div>
+  <div class="main-content" id="main-content">
+    <div id="topbar-mount"></div>
+
+    <div class="page-content" style="max-width:1100px">
+
+      <!-- System Info -->
+      <div class="row g-3 mb-4">
+        <div class="col-12" data-aos="fade-up">
+          <div class="glass-card p-0">
+            <div class="card-header-bar">
+              <div class="card-title text-green"><i class="fa-solid fa-circle-info"></i> System Information</div>
+              <span class="badge-military badge-green">OPERATIONAL</span>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12 col-md-8">
+                  <div class="row g-2">
+                    <script>
+                      const SYSINFO=[
+                        ['System Name','Sentinel-X Unified Surveillance'],
+                        ['Version','v2.1.4 BUILD-2024-0630'],
+                        ['License','MILITARY CLASSIFIED'],
+                        ['Uptime','14d 6h 32m'],
+                        ['CPU Usage','23%'],
+                        ['Memory','4.2 / 16 GB'],
+                        ['Storage','128 / 500 GB'],
+                        ['Last Update','3 days ago'],
+                        ['Active Sessions','4 operators'],
+                        ['Classification','TOP SECRET'],
+                      ];
+                      document.write(SYSINFO.map(([k,v])=>`
+                        <div class="col-6 col-md-4">
+                          <div style="padding:10px;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px">
+                            <div class="mono" style="font-size:9px;color:var(--text-muted);text-transform:uppercase">${k}</div>
+                            <div class="mono text-green" style="font-size:11px;font-weight:600;margin-top:2px">${v}</div>
+                          </div>
+                        </div>`).join(''));
+                    </script>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4 d-flex align-items-center justify-content-center">
+                  <div class="text-center">
+                    <div class="radar-container" style="width:140px;height:140px;margin:0 auto 12px">
+                      <div class="radar-sweep"></div>
+                      <div class="radar-blip" style="top:35%;left:60%"></div>
+                      <div class="radar-blip" style="top:55%;left:30%;animation-delay:.8s"></div>
+                    </div>
+                    <div class="mono text-green" style="font-size:11px">ALL SYSTEMS NOMINAL</div>
+                    <div class="mono" style="font-size:10px;color:var(--text-muted);margin-top:4px">Health Score: 94/100</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+
+        <!-- Alert Settings -->
+        <div class="col-12 col-lg-6" data-aos="fade-up">
+          <div class="glass-card h-100">
+            <div class="card-body">
+              <div class="settings-section-title text-amber"><i class="fa-solid fa-bell"></i> Alerts & Notifications</div>
+              <div class="setting-row"><div><div class="setting-label">Push Notifications</div><div class="setting-desc">Real-time alerts on dashboard</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('push_notif',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Critical Alert Sound</div><div class="setting-desc">Danger beep on critical events</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('alert_sound',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Email Alerts</div><div class="setting-desc">Send to registered addresses</div></div><label class="toggle"><input type="checkbox" onchange="saveSetting('email_alerts',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">SMS Alerts</div><div class="setting-desc">SMS to emergency contacts</div></div><label class="toggle"><input type="checkbox" onchange="saveSetting('sms_alerts',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Low Battery Alert</div><div class="setting-desc">Trigger at 20% battery level</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('battery_alert',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Geofence Breach Alert</div><div class="setting-desc">Notify on boundary violations</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('geofence_alert',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row">
+                <div><div class="setting-label">Alert Popup Interval</div><div class="setting-desc">Demo: seconds between popups</div></div>
+                <select class="mil-select" onchange="saveSetting('popup_interval',this.value)">
+                  <option value="3">3 seconds</option><option value="5" selected>5 seconds</option><option value="10">10 seconds</option><option value="0">Disabled</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card h-100">
+            <div class="card-body">
+              <div class="settings-section-title text-red"><i class="fa-solid fa-shield-halved"></i> Security & Encryption</div>
+              <div class="setting-row"><div><div class="setting-label">AES-256 Encryption</div><div class="setting-desc">All communication channels</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('encryption',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">VPN Tunnel</div><div class="setting-desc">Secure remote access</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('vpn',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">2FA Authentication</div><div class="setting-desc">Two-factor login required</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('2fa',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Audit Logging</div><div class="setting-desc">Log all operator actions</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('audit_log',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">AI Intrusion Detection</div><div class="setting-desc">ML-based anomaly detection</div></div><label class="toggle"><input type="checkbox" checked onchange="saveSetting('ids',this.checked)"><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Auto Session Timeout</div><div class="setting-desc">Lock after inactivity</div></div>
+                <select class="mil-select"><option>5 minutes</option><option selected>15 minutes</option><option>30 minutes</option><option>Never</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI & Detection -->
+        <div class="col-12 col-lg-6" data-aos="fade-up">
+          <div class="glass-card">
+            <div class="card-body">
+              <div class="settings-section-title text-purple"><i class="fa-solid fa-brain"></i> AI & Detection Engine</div>
+              <div class="setting-row"><div><div class="setting-label">Human Detection</div><div class="setting-desc">Neural network v3.1</div></div><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Vehicle Detection</div><div class="setting-desc">98.2% accuracy</div></div><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Face Recognition</div><div class="setting-desc">128-bit facial encoding</div></div><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">License Plate OCR</div><div class="setting-desc">Vehicle identification</div></div><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Predictive Threat AI</div><div class="setting-desc">BETA — ML threat prediction</div></div><label class="toggle"><input type="checkbox"><div class="toggle-track"></div></label></div>
+              <div class="setting-row">
+                <div><div class="setting-label">AI Confidence Threshold</div><div class="setting-desc">Minimum confidence to alert</div></div>
+                <select class="mil-select"><option>70%</option><option selected>80%</option><option>90%</option><option>95%</option></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Network Config -->
+        <div class="col-12 col-lg-6" data-aos="fade-up" data-aos-delay="50">
+          <div class="glass-card">
+            <div class="card-body">
+              <div class="settings-section-title text-blue"><i class="fa-solid fa-wifi"></i> Network Configuration</div>
+              <div class="row g-3">
+                <div class="col-6"><label class="mono" style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Server IP</label><input class="mil-input" value="192.168.1.100"/></div>
+                <div class="col-6"><label class="mono" style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Port</label><input class="mil-input" value="8443"/></div>
+                <div class="col-6"><label class="mono" style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Protocol</label><select class="mil-select" style="width:100%"><option selected>WSS / HTTPS</option><option>WS / HTTP</option></select></div>
+                <div class="col-6"><label class="mono" style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Timeout</label><input class="mil-input" value="30s"/></div>
+                <div class="col-12"><label class="mono" style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">API Key</label><input class="mil-input" value="sk-mil-••••••••••••••••••••••••" type="password"/></div>
+              </div>
+              <div class="setting-row mt-3"><div><div class="setting-label">Auto Reconnect</div><div class="setting-desc">Reconnect on connection loss</div></div><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label></div>
+              <div class="setting-row"><div><div class="setting-label">Cloud Sync</div><div class="setting-desc">Sync data to secure cloud</div></div><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div></label></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save buttons -->
+        <div class="col-12" data-aos="fade-up">
+          <div class="d-flex justify-content-end gap-3">
+            <button class="btn-mil btn-mil-green" onclick="saveAllSettings()"><i class="fa-solid fa-floppy-disk"></i> Save All Settings</button>
+            <button class="btn-mil" style="color:#666;border-color:#333" onclick="if(confirm('Reset all settings to defaults?'))location.reload()"><i class="fa-solid fa-rotate-left"></i> Reset Defaults</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="alert-popup-container" id="alert-popup-container"></div>
+<script src="assets/js/components.js"></script>
+<script>
+function saveSetting(key,val){
+  console.log('Setting saved:',key,'=',val);
+  // Backend integration point: POST /api/settings
+}
+function saveAllSettings(){
+  const toast=document.createElement('div');
+  toast.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(0,255,65,.1);border:1px solid rgba(0,255,65,.3);color:var(--accent-green);font-family:var(--font-mono);font-size:12px;padding:12px 24px;border-radius:8px;z-index:9999;';
+  toast.textContent='✓ Settings saved successfully';
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('sidebar-mount').innerHTML=buildSidebar('settings');
+  document.getElementById('topbar-mount').innerHTML=buildTopbar('System Settings','Configuration & Administration');
+  initComponents();AOS.init({duration:500,once:true});
+});
+</script>
+</body>
+</html>
